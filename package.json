@@ -1,0 +1,22 @@
+{
+  "name": "visionflow-touchless",
+  "version": "2.0.0",
+  "description": "Premium Touchless Navigation Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve .",
+    "dev": "serve ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  },
+  "keywords": [
+    "touchless",
+    "mediapipe",
+    "hand-tracking",
+    "libras",
+    "visionflow"
+  ],
+  "author": "VisionFlow Team",
+  "license": "MIT"
+}

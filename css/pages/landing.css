@@ -1,0 +1,97 @@
+body {
+    background-image: 
+        radial-gradient(circle at 15% 15%, var(--bg-gradient-1), transparent 30%),
+        radial-gradient(circle at 85% 85%, var(--bg-gradient-2), transparent 40%);
+    background-attachment: fixed;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    background: var(--paper);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 12px 18px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: "Outfit", sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: -0.02em;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(120deg, var(--brand), var(--accent));
+    box-shadow: 0 0 12px var(--brand-glow);
+    animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 12px var(--brand-glow); }
+    100% { transform: scale(1.2); box-shadow: 0 0 24px var(--brand-glow); }
+}
+
+.hero {
+    margin-top: 32px;
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    background: var(--paper);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    padding: clamp(30px, 5vw, 48px);
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 32px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero h1 {
+    font-family: "Outfit", sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    background: linear-gradient(135deg, var(--ink), var(--brand));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.fact {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--paper-solid);
+    padding: 20px;
+}
+
+.preview {
+    margin-top: 24px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+iframe {
+    width: 100%;
+    min-height: 720px;
+    border: 0;
+}

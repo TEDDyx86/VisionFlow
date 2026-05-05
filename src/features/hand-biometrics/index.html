@@ -3,614 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VisionFlow | Controle por Gestos</title>
+    <title>VisionFlow | Hand Biometrics Lab</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #f5f4ef;
-            --bg-soft: #ffffff;
-            --ink: #0c2a3f;
-            --ink-soft: #4a6275;
-            --line: #d5dde4;
-            --brand: #1f6f78;
-            --brand-2: #f4a261;
-            --ok: #2a9d8f;
-            --warn: #cf5c36;
-            --shadow: 0 22px 44px rgba(15, 35, 52, 0.12);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            min-height: 100%;
-            color: var(--ink);
-            font-family: "DM Sans", sans-serif;
-            background:
-                radial-gradient(circle at 8% 10%, rgba(31, 111, 120, 0.13), transparent 28%),
-                radial-gradient(circle at 92% 0%, rgba(244, 162, 97, 0.22), transparent 34%),
-                linear-gradient(170deg, #f3f2eb 0%, #f7f6f2 48%, #ebeef2 100%);
-            overflow-x: hidden;
-        }
-
-        .shape {
-            position: fixed;
-            pointer-events: none;
-            z-index: 0;
-            filter: blur(36px);
-            opacity: 0.52;
-            border-radius: 999px;
-        }
-
-        .shape-a {
-            width: 220px;
-            height: 220px;
-            top: -60px;
-            right: 2vw;
-            background: rgba(31, 111, 120, 0.32);
-        }
-
-        .shape-b {
-            width: 260px;
-            height: 260px;
-            bottom: -80px;
-            left: -80px;
-            background: rgba(244, 162, 97, 0.32);
-        }
-
-        #videoElement {
-            display: none;
-        }
-
-        #cursor-virtual {
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            background: radial-gradient(circle at 35% 35%, #f2fffd 0, #56b7b0 60%, #1f6f78 100%);
-            box-shadow: 0 0 0 6px rgba(31, 111, 120, 0.14), 0 0 26px rgba(31, 111, 120, 0.4);
-            transition: transform 120ms ease;
-        }
-
-        #cursor-virtual.clicando {
-            transform: translate(-50%, -50%) scale(0.68);
-            background: radial-gradient(circle at 35% 35%, #fff8ed 0, #f4a261 60%, #cf5c36 100%);
-            box-shadow: 0 0 0 8px rgba(244, 162, 97, 0.18), 0 0 28px rgba(207, 92, 54, 0.42);
-        }
-
-        #landmarkCanvas,
-        #effectsCanvas {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-        }
-
-        #landmarkCanvas {
-            z-index: 9998;
-            display: none;
-        }
-
-        #effectsCanvas {
-            z-index: 9997;
-        }
-
-        .toast {
-            position: fixed;
-            left: 50%;
-            bottom: 24px;
-            transform: translateX(-50%);
-            z-index: 10030;
-            border-radius: 999px;
-            padding: 11px 18px;
-            background: linear-gradient(120deg, #2a9d8f, #4ca59f);
-            color: #f9fffe;
-            font-weight: 700;
-            box-shadow: 0 12px 28px rgba(22, 60, 65, 0.28);
-            display: none;
-        }
-
-        .consent-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 10020;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(9, 20, 30, 0.4);
-            backdrop-filter: blur(6px);
-        }
-
-        .consent-overlay.hidden {
-            display: none;
-        }
-
-        .consent-card {
-            width: min(560px, 100%);
-            border: 1px solid var(--line);
-            border-radius: 20px;
-            background: #fff;
-            padding: 24px;
-            box-shadow: var(--shadow);
-        }
-
-        .consent-card p {
-            margin: 8px 0 0;
-            color: var(--ink-soft);
-            line-height: 1.6;
-        }
-
-        .consent-actions {
-            margin-top: 18px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .app {
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 22px clamp(14px, 3vw, 30px) 70px;
-        }
-
-        .hero {
-            display: flex;
-            justify-content: space-between;
-            gap: 14px;
-            align-items: flex-start;
-            animation: fade-up 520ms ease both;
-        }
-
-        .hero-links {
-            margin-top: 10px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .eyebrow {
-            margin: 0;
-            font-family: "Space Grotesk", sans-serif;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--brand);
-            font-size: 0.78rem;
-            font-weight: 700;
-        }
-
-        h1 {
-            margin: 8px 0 6px;
-            font-family: "Space Grotesk", sans-serif;
-            letter-spacing: -0.02em;
-            font-size: clamp(1.95rem, 4.8vw, 3rem);
-            line-height: 1.04;
-        }
-
-        .hero p {
-            margin: 0;
-            max-width: 700px;
-            color: var(--ink-soft);
-            line-height: 1.7;
-        }
-
-        .back-link {
-            text-decoration: none;
-            white-space: nowrap;
-            border: 1px solid var(--line);
-            background: rgba(255, 255, 255, 0.85);
-            color: var(--ink);
-            border-radius: 999px;
-            padding: 10px 14px;
-            font-weight: 700;
-            box-shadow: 0 8px 20px rgba(14, 35, 50, 0.08);
-        }
-
-        .status-strip {
-            margin-top: 14px;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .status-card {
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.72);
-            padding: 10px 12px;
-        }
-
-        .status-card span {
-            display: block;
-        }
-
-        .status-label {
-            color: var(--ink-soft);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            font-size: 0.74rem;
-        }
-
-        .status-value {
-            margin-top: 6px;
-            font-weight: 700;
-            font-size: 1rem;
-        }
-
-        #camera-status.detectado,
-        #hand-status.detectado,
-        #fallback-status.detectado {
-            color: var(--ok);
-        }
-
-        #camera-status.perdido,
-        #hand-status.perdido,
-        #fallback-status.perdido {
-            color: var(--warn);
-        }
-
-        #status {
-            margin: 14px 0 0;
-            color: var(--ink-soft);
-            font-weight: 700;
-        }
-
-        .layout {
-            margin-top: 16px;
-            display: grid;
-            grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
-            gap: 12px;
-            align-items: start;
-        }
-
-        .panel {
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.84);
-            box-shadow: var(--shadow);
-            padding: 16px;
-            animation: fade-up 620ms ease both;
-        }
-
-        .panel h2 {
-            margin: 0 0 10px;
-            font-family: "Space Grotesk", sans-serif;
-            font-size: 1.06rem;
-            letter-spacing: 0.01em;
-        }
-
-        .muted {
-            margin: 0;
-            color: var(--ink-soft);
-            line-height: 1.6;
-        }
-
-        .stack {
-            display: grid;
-            gap: 10px;
-        }
-
-        .controls {
-            display: grid;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .btn {
-            border-radius: 12px;
-            border: 1px solid transparent;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 0.9rem;
-            padding: 11px 12px;
-            cursor: pointer;
-            transition: transform 120ms ease, box-shadow 120ms ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-        }
-
-        .btn.primary {
-            color: #fff;
-            background: linear-gradient(120deg, #1f6f78, #3c8f97);
-            box-shadow: 0 10px 22px rgba(31, 111, 120, 0.28);
-        }
-
-        .btn.secondary {
-            color: var(--ink);
-            background: #fff;
-            border-color: var(--line);
-        }
-
-        .btn.action {
-            color: #1e2d3a;
-            background: linear-gradient(120deg, #f7d8bd, #f4c89f);
-            border-color: rgba(224, 161, 108, 0.6);
-        }
-
-        .slider-row {
-            display: grid;
-            gap: 6px;
-        }
-
-        .slider-row label {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: var(--ink);
-            font-weight: 700;
-        }
-
-        .slider-row input[type="range"] {
-            width: 100%;
-            accent-color: var(--brand);
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
-        }
-
-        .stat-box {
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .stat-box span {
-            display: block;
-            color: var(--ink-soft);
-            font-size: 0.75rem;
-        }
-
-        .stat-box strong {
-            display: block;
-            margin-top: 4px;
-            font-size: 0.95rem;
-        }
-
-        .demo-actions {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
-        }
-
-        .scroll-zone {
-            margin-top: 12px;
-            display: grid;
-            gap: 10px;
-        }
-
-        .lane-card {
-            min-height: clamp(220px, 40vh, 320px);
-            border: 1px dashed #b5c0ca;
-            border-radius: 14px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            background: linear-gradient(160deg, rgba(255, 255, 255, 0.7), rgba(247, 244, 239, 0.9));
-        }
-
-        .lane-card h3 {
-            margin: 0;
-            font-family: "Space Grotesk", sans-serif;
-            font-size: 1.15rem;
-        }
-
-        .lane-card p {
-            margin: 8px 0 0;
-            color: var(--ink-soft);
-            line-height: 1.6;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @keyframes fade-up {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 980px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            .status-strip {
-                grid-template-columns: 1fr;
-            }
-
-            .hero {
-                flex-direction: column;
-            }
-        }
-
-        @media (max-width: 720px) {
-            .stats,
-            .demo-actions {
-                grid-template-columns: 1fr;
-            }
-
-            .consent-actions {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/tokens.css">
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/pages/biometrics.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 </head>
 <body>
-    <div class="shape shape-a"></div>
-    <div class="shape shape-b"></div>
-
-    <div id="cursor-virtual"></div>
+    <div id="hand-cursor"></div>
     <canvas id="landmarkCanvas"></canvas>
     <canvas id="effectsCanvas"></canvas>
     <video id="videoElement" autoplay muted playsinline></video>
-    <div id="notification-toast" class="toast"></div>
+
+    <div id="notification-toast" class="toast" style="display: none;"></div>
 
     <div id="consent-modal" class="consent-overlay hidden">
         <div class="consent-card">
-            <p class="eyebrow">Privacidade</p>
-            <h2>Ativar camera para controle por gestos</h2>
-            <p>O processamento e local no navegador. Se preferir, voce pode continuar sem camera usando fallback por teclado.</p>
-            <div class="consent-actions">
-                <button id="accept-consent" class="btn primary">Aceitar e iniciar camera</button>
-                <button id="deny-consent" class="btn secondary">Continuar sem camera</button>
+            <h2>Permissão de Câmera</h2>
+            <p style="margin: 16px 0; color: var(--ink-soft);">Para rastrear sua mão e controlar o cursor, precisamos acessar sua câmera. Todo o processamento ocorre localmente no seu navegador.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="accept-consent" class="btn btn-primary">Aceitar</button>
+                <button id="deny-consent" class="btn btn-secondary">Recusar</button>
             </div>
         </div>
     </div>
 
-    <div class="app">
-        <header class="hero">
-            <div>
-                <p class="eyebrow">VisionFlow Core</p>
-                <h1>Controle por gestos com foco em acessibilidade</h1>
-                <p>Versao simplificada da ferramenta, com apenas o que importa: mover cursor, clicar por pinca, rolar por altura da mao e fallback por teclado.</p>
-                <div class="hero-links">
-                    <a class="back-link" href="../libras/index.html">Studio Libras</a>
-                </div>
+    <div class="wrap">
+        <header style="margin-bottom: 32px;">
+            <p class="status-label">Laboratório Experimental</p>
+            <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.5rem;">Hand Biometrics 2.0</h1>
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+                <a href="/index.html" class="btn btn-secondary">Voltar ao Início</a>
+                <a href="/libras" class="btn btn-secondary">Studio Libras</a>
             </div>
-            <a class="back-link" href="../../../index.html">Pagina inicial</a>
         </header>
 
-        <section class="status-strip">
+        <div class="status-strip">
             <article class="status-card">
-                <span class="status-label">Camera</span>
-                <span id="camera-status" class="status-value perdido">Desligada</span>
+                <span class="status-label">Câmera</span>
+                <div id="camera-status" class="status-value perdido">Desligada</div>
             </article>
             <article class="status-card">
-                <span class="status-label">Mao</span>
-                <span id="hand-status" class="status-value perdido">Nao detectada</span>
+                <span class="status-label">Rastreio de Mão</span>
+                <div id="hand-status" class="status-value perdido">Nenhuma mão</div>
             </article>
             <article class="status-card">
-                <span class="status-label">Fallback</span>
-                <span id="fallback-status" class="status-value detectado">Teclado ativo</span>
+                <span class="status-label">Métricas Engine</span>
+                <div id="metrics-status" class="status-value">Calibrando...</div>
             </article>
-        </section>
+        </div>
 
-        <p id="status">Inicie a camera para usar gestos ou continue no fallback por teclado.</p>
-
-        <main class="layout">
-            <section class="stack">
-                <article class="panel">
-                    <h2>Controle rapido</h2>
-                    <p class="muted">Comandos essenciais para iniciar e ajustar a experiencia.</p>
-                    <div class="controls">
-                        <button id="toggle-camera" class="btn primary">Iniciar camera</button>
-                        <button id="toggle-landmarks" class="btn secondary">Mostrar landmarks</button>
-                    </div>
-                </article>
-
-                <article class="panel">
-                    <h2>Calibracao</h2>
-                    <div class="stack">
-                        <div class="slider-row">
-                            <label for="slider-smoothing">Suavizacao do cursor <strong id="value-smoothing">0.24</strong></label>
-                            <input id="slider-smoothing" type="range" min="0.12" max="0.45" step="0.01" value="0.24">
-                        </div>
-                        <div class="slider-row">
-                            <label for="slider-pinch">Limiar da pinca <strong id="value-pinch">0.055</strong></label>
-                            <input id="slider-pinch" type="range" min="0.035" max="0.09" step="0.001" value="0.055">
-                        </div>
-                        <div class="slider-row">
-                            <label for="slider-scroll">Velocidade de scroll <strong id="value-scroll">16</strong></label>
-                            <input id="slider-scroll" type="range" min="8" max="30" step="1" value="16">
-                        </div>
-                    </div>
-                </article>
-
-                <article class="panel">
-                    <h2>Metricas ao vivo</h2>
-                    <div class="stats">
-                        <div class="stat-box">
-                            <span>Velocidade cursor</span>
-                            <strong id="cursor-speed">0 px/s</strong>
-                        </div>
-                        <div class="stat-box">
-                            <span>Confianca</span>
-                            <strong id="detection-confidence">0%</strong>
-                        </div>
-                        <div class="stat-box">
-                            <span>Cliques</span>
-                            <strong id="total-clicks">0</strong>
-                        </div>
-                        <div class="stat-box">
-                            <span>Scrolls</span>
-                            <strong id="total-scrolls">0</strong>
-                        </div>
-                        <div class="stat-box">
-                            <span>Mao ativa</span>
-                            <strong id="hand-uptime">0s</strong>
-                        </div>
-                        <div class="stat-box">
-                            <span>FPS</span>
-                            <strong id="fps-counter">0 FPS</strong>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="panel">
-                    <h2>Acessibilidade</h2>
-                    <p class="muted">Fallback: setas ou WASD para mover o cursor virtual, Enter ou Espaco para clicar.</p>
-                </article>
+        <main class="controls-grid">
+            <section class="panel">
+                <h2>Controle do Lab</h2>
+                <div style="display: grid; gap: 12px; margin-top: 16px;">
+                    <button id="toggle-camera" class="btn btn-primary">Iniciar Câmera</button>
+                    <button id="toggle-landmarks" class="btn btn-secondary">Toggle Landmarks</button>
+                    <button id="reset-settings" class="btn btn-warn">Resetar Calibração</button>
+                </div>
             </section>
 
-            <section class="stack">
-                <article class="panel">
-                    <h2>Area de teste de clique</h2>
-                    <div class="demo-actions">
-                        <button id="btn-action-1" class="btn action">Abrir trilha de codigo</button>
-                        <button id="btn-action-2" class="btn action">Abrir trilha maker</button>
-                        <button id="btn-action-3" class="btn action">Ver ajuda rapida</button>
+            <section class="panel">
+                <h2>Ajustes de Precisão</h2>
+                <div class="slider-wrap" style="margin-top: 16px;">
+                    <div class="slider-row">
+                        <label>Suavização EMA <span id="val-smoothing">0.65</span></label>
+                        <input id="slider-smoothing" type="range" min="30" max="95" value="65">
                     </div>
-                </article>
-
-                <article class="panel">
-                    <h2>Zona de scroll por gesto</h2>
-                    <p class="muted">Levante a mao para cima da zona neutra para subir e para baixo para descer.</p>
-                    <div class="scroll-zone">
-                        <article class="lane-card">
-                            <h3>Checkpoint 1</h3>
-                            <p>Movimento vertical da mao controla rolagem de forma progressiva.</p>
-                        </article>
-                        <article class="lane-card">
-                            <h3>Checkpoint 2</h3>
-                            <p>Use esta area para calibrar suavizacao e velocidade de scroll.</p>
-                        </article>
-                        <article class="lane-card">
-                            <h3>Checkpoint 3</h3>
-                            <p>Teste sem camera: fallback por teclado continua funcionando para navegacao.</p>
-                        </article>
+                    <div class="slider-row">
+                        <label>Sensibilidade Pinça <span id="val-pinch">45%</span></label>
+                        <input id="slider-pinch" type="range" min="20" max="80" value="45">
                     </div>
-                </article>
+                    <div class="slider-row">
+                        <label>Velocidade Scroll <span id="val-scroll">15x</span></label>
+                        <input id="slider-scroll" type="range" min="5" max="40" value="15">
+                    </div>
+                </div>
             </section>
         </main>
+
+        <section class="panel" style="margin-top: 24px;">
+            <h2>Instruções de Uso</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 16px;">
+                <div>
+                    <strong style="color: var(--brand);">Navegação:</strong>
+                    <p class="muted">Mova sua mão aberta para controlar o cursor na tela.</p>
+                </div>
+                <div>
+                    <strong style="color: var(--brand);">Clique:</strong>
+                    <p class="muted">Una o polegar e o indicador (pinça) para clicar.</p>
+                </div>
+                <div>
+                    <strong style="color: var(--brand);">Scroll:</strong>
+                    <p class="muted">Mova sua mão para o topo ou base da janela para rolar.</p>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="/src/features/hand-biometrics/main.js"></script>
 </body>
 </html>

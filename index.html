@@ -7,406 +7,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root[data-theme="light"] {
-            --bg-base: #f8fafc;
-            --bg-gradient-1: rgba(31, 111, 120, 0.15);
-            --bg-gradient-2: rgba(244, 162, 97, 0.25);
-            --paper: rgba(255, 255, 255, 0.75);
-            --paper-solid: #ffffff;
-            --ink: #0f172a;
-            --ink-soft: #475569;
-            --line: rgba(148, 163, 184, 0.3);
-            --brand: #1f6f78;
-            --brand-glow: rgba(31, 111, 120, 0.4);
-            --accent: #f4a261;
-            --shadow: 0 24px 44px rgba(15, 23, 42, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.5);
-        }
-
-        :root[data-theme="dark"] {
-            --bg-base: #0b1120;
-            --bg-gradient-1: rgba(45, 212, 191, 0.15);
-            --bg-gradient-2: rgba(251, 146, 60, 0.12);
-            --paper: rgba(30, 41, 59, 0.6);
-            --paper-solid: #1e293b;
-            --ink: #f8fafc;
-            --ink-soft: #94a3b8;
-            --line: rgba(148, 163, 184, 0.12);
-            --brand: #2dd4bf;
-            --brand-glow: rgba(45, 212, 191, 0.4);
-            --accent: #fb923c;
-            --shadow: 0 24px 44px rgba(0, 0, 0, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.05);
-        }
-
-        * {
-            box-sizing: border-box;
-            transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
-        }
-
-        html, body {
-            margin: 0;
-            min-height: 100%;
-            background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(circle at 15% 15%, var(--bg-gradient-1), transparent 30%),
-                radial-gradient(circle at 85% 85%, var(--bg-gradient-2), transparent 40%);
-            background-attachment: fixed;
-            color: var(--ink);
-            font-family: "Inter", sans-serif;
-            overflow-x: hidden;
-        }
-
-        .wrap {
-            max-width: 1160px;
-            margin: 0 auto;
-            padding: 24px clamp(14px, 3vw, 30px) 72px;
-            opacity: 0;
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            background: var(--paper);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 12px 18px;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-family: "Outfit", sans-serif;
-            font-weight: 800;
-            font-size: 1.2rem;
-            letter-spacing: -0.02em;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 999px;
-            background: linear-gradient(120deg, var(--brand), var(--accent));
-            box-shadow: 0 0 12px var(--brand-glow);
-            animation: pulse 2s infinite alternate;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 12px var(--brand-glow); }
-            100% { transform: scale(1.2); box-shadow: 0 0 24px var(--brand-glow); }
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--ink);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            border: 1px solid var(--line);
-            transition: all 0.2s ease;
-        }
-
-        .theme-toggle:hover {
-            background: var(--paper-solid);
-            transform: scale(1.05);
-        }
-
-        .hero {
-            margin-top: 32px;
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            background: var(--paper);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            padding: clamp(30px, 5vw, 48px);
-            box-shadow: var(--shadow);
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 32px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--brand), transparent);
-            opacity: 0.5;
-        }
-
-        .eyebrow {
-            margin: 0;
-            font-family: "Outfit", sans-serif;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            color: var(--brand);
-            font-weight: 800;
-        }
-
-        h1 {
-            margin: 12px 0 16px;
-            font-family: "Outfit", sans-serif;
-            letter-spacing: -0.03em;
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            line-height: 1.05;
-            background: linear-gradient(135deg, var(--ink), var(--brand));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            margin: 0;
-            color: var(--ink-soft);
-            line-height: 1.8;
-            font-size: 1.1rem;
-            max-width: 600px;
-        }
-
-        .cta-row {
-            margin-top: 28px;
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            text-decoration: none;
-            border-radius: 12px;
-            padding: 14px 24px;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--brand);
-            color: #fff;
-            box-shadow: 0 12px 24px var(--brand-glow);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 16px 32px var(--brand-glow);
-            filter: brightness(1.1);
-        }
-
-        .btn-secondary {
-            background: var(--paper-solid);
-            color: var(--ink);
-            border: 1px solid var(--line);
-        }
-
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-            border-color: var(--brand);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-
-        .facts {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            align-content: center;
-        }
-
-        .fact {
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            background: var(--paper-solid);
-            padding: 20px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .fact:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px var(--brand-glow);
-            border-color: var(--brand);
-        }
-
-        .fact span {
-            display: block;
-            color: var(--ink-soft);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-        }
-
-        .fact strong {
-            display: block;
-            margin-top: 8px;
-            font-size: 1.1rem;
-            font-family: "Outfit", sans-serif;
-            color: var(--ink);
-        }
-
-        .section {
-            margin-top: 32px;
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            background: var(--paper);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 32px;
-            box-shadow: var(--shadow);
-        }
-
-        .section h2 {
-            margin: 0 0 12px;
-            font-family: "Outfit", sans-serif;
-            font-size: 2rem;
-            letter-spacing: -0.02em;
-        }
-
-        .section p {
-            margin: 0;
-            color: var(--ink-soft);
-            line-height: 1.7;
-            font-size: 1.1rem;
-        }
-
-        .features {
-            margin-top: 24px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-        }
-
-        .feature {
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            background: var(--paper-solid);
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .feature:hover {
-            border-color: var(--brand);
-            transform: scale(1.02);
-        }
-
-        .feature h3 {
-            margin: 0;
-            font-family: "Outfit", sans-serif;
-            font-size: 1.2rem;
-            color: var(--ink);
-        }
-
-        .feature p {
-            margin: 12px 0 0;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: var(--ink-soft);
-        }
-
-        .preview {
-            margin-top: 24px;
-            border: 1px solid var(--line);
-            border-radius: 20px;
-            overflow: hidden;
-            background: var(--bg-base);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .preview:hover {
-            box-shadow: 0 0 0 2px var(--brand), 0 20px 40px var(--brand-glow);
-        }
-
-        .preview-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--line);
-            padding: 12px 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--ink-soft);
-            background: var(--paper-solid);
-        }
-
-        .preview-dots {
-            display: flex;
-            gap: 6px;
-        }
-        .preview-dots span {
-            width: 10px; height: 10px; border-radius: 50%;
-            background: var(--line);
-        }
-
-        iframe {
-            width: 100%;
-            min-height: 720px;
-            border: 0;
-            background: var(--bg-base);
-        }
-
-        .footer {
-            margin-top: 48px;
-            text-align: center;
-            color: var(--ink-soft);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        @media (max-width: 980px) {
-            .hero {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 760px) {
-            .facts {
-                grid-template-columns: 1fr;
-            }
-            iframe {
-                min-height: 560px;
-            }
-            .wrap {
-                padding: 16px 16px 40px;
-            }
-        }
-        
-        /* Ícones SVG */
-        .icon {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-    </style>
+    
+    <link rel="stylesheet" href="/css/tokens.css">
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/pages/landing.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 </head>
 <body>
     <div class="wrap">
@@ -416,8 +22,8 @@
                 VisionFlow 2.0
             </div>
             <div class="header-actions">
-                <button class="theme-toggle" id="theme-toggle" aria-label="Alternar tema">
-                    <svg class="icon moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <button class="btn btn-secondary" id="theme-toggle" aria-label="Alternar tema">
+                    <!-- Icon will be set by JS -->
                 </button>
                 <a class="btn btn-secondary" href="README.md">Docs</a>
             </div>
@@ -425,109 +31,94 @@
 
         <section class="hero">
             <div>
-                <p class="eyebrow">Aesthetics WOW</p>
+                <p class="status-label">Aesthetics WOW</p>
                 <h1>O futuro da interacao começa aqui. Sem toques.</h1>
                 <p>Nossa plataforma touchless redefinida com um Design System Premium. Navegue na web usando a câmera com um feedback visual mágico e responsivo.</p>
-                <div class="cta-row">
-                    <a class="btn btn-primary" href="src/features/hand-biometrics/index.html">
+                <div class="status-strip" style="margin-top: 28px; border: 0; background: transparent;">
+                    <a class="btn btn-primary" href="/biometria">
                         Abrir Biometria Lab
                     </a>
-                    <a class="btn btn-secondary" href="src/features/libras/index.html">
+                    <a class="btn btn-secondary" href="/libras">
                         Studio Libras
                     </a>
                 </div>
             </div>
             <aside class="facts">
                 <article class="fact">
-                    <span>Aura Feedback</span>
-                    <strong>Brilho Inteligente</strong>
+                    <span class="status-label">Aura Feedback</span>
+                    <strong class="status-value">Brilho Inteligente</strong>
                 </article>
                 <article class="fact">
-                    <span>Performance</span>
-                    <strong>60fps Local</strong>
+                    <span class="status-label">Performance</span>
+                    <strong class="status-value">60fps Local</strong>
                 </article>
                 <article class="fact">
-                    <span>Design System</span>
-                    <strong>Dark Mode Nativo</strong>
+                    <span class="status-label">Design System</span>
+                    <strong class="status-value">Dark Mode Nativo</strong>
                 </article>
                 <article class="fact">
-                    <span>Privacidade</span>
-                    <strong>100% no Browser</strong>
+                    <span class="status-label">Privacidade</span>
+                    <strong class="status-value">100% no Browser</strong>
                 </article>
             </aside>
         </section>
 
-        <section class="section">
+        <section class="panel" style="margin-top: 32px;">
             <h2>Tecnologia sob o capô</h2>
             <p>A interface premium foi construída sobre um motor robusto de visão computacional em Vanilla JS.</p>
-            <div class="features">
-                <article class="feature">
+            <div class="status-strip" style="margin-top: 24px; border: 0; background: transparent; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+                <article class="status-card">
                     <h3>Cursor EMA Adaptativo</h3>
-                    <p>Movimento suave e preciso com histerese dinâmica. Reduz tremores em movimentos lentos.</p>
+                    <p class="muted">Movimento suave e preciso com histerese dinâmica. Reduz tremores em movimentos lentos.</p>
                 </article>
-                <article class="feature">
+                <article class="status-card">
                     <h3>Clique Z-Index</h3>
-                    <p>O gesto de pinça calcula a profundidade 3D da mão para evitar falsos positivos.</p>
+                    <p class="muted">O gesto de pinça calcula a profundidade 3D da mão para evitar falsos positivos.</p>
                 </article>
-                <article class="feature">
+                <article class="status-card">
                     <h3>Scroll Dinâmico</h3>
-                    <p>Zona neutra inteligente que rola a página proporcionalmente à altura da sua mão.</p>
+                    <p class="muted">Zona neutra inteligente que rola a página proporcionalmente à altura da sua mão.</p>
                 </article>
-                <article class="feature">
+                <article class="status-card">
                     <h3>Fallback Acessível</h3>
-                    <p>Controle alternativo por setas e WASD sempre disponível quando a câmera estiver desligada.</p>
+                    <p class="muted">Controle alternativo por setas e WASD sempre disponível quando a câmera estiver desligada.</p>
                 </article>
             </div>
         </section>
 
-        <section class="section">
+        <section class="panel" style="margin-top: 32px;">
             <h2>Live Preview</h2>
             <p>Experimente o motor biométrico diretamente aqui. (Permita a câmera)</p>
             <div class="preview">
-                <div class="preview-head">
-                    <div class="preview-dots">
-                        <span></span><span></span><span></span>
-                    </div>
-                    <span>visionflow://hand-biometrics</span>
-                </div>
-                <iframe src="src/features/hand-biometrics/index.html" title="VisionFlow Hand Biometrics" allow="camera"></iframe>
+                <iframe src="/biometria" title="VisionFlow Hand Biometrics" allow="camera"></iframe>
             </div>
         </section>
 
-        <p class="footer">VisionFlow <span id="year"></span> · Design System Premium</p>
+        <p style="margin-top: 48px; text-align: center; color: var(--ink-soft);">VisionFlow <span id="year"></span> · Design System Premium</p>
     </div>
 
-    <script>
+    <script type="module">
         document.getElementById("year").textContent = new Date().getFullYear();
 
-        // Theme Switcher Logic
         const toggleBtn = document.getElementById('theme-toggle');
         const htmlElement = document.documentElement;
         
-        // Auto-detect system preference
+        const updateIcon = (theme) => {
+            toggleBtn.innerHTML = theme === 'dark' 
+                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        };
+
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             htmlElement.setAttribute('data-theme', 'dark');
         }
+        updateIcon(htmlElement.getAttribute('data-theme'));
 
         toggleBtn.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const newTheme = htmlElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             htmlElement.setAttribute('data-theme', newTheme);
-            
-            // Update icon
-            if (newTheme === 'dark') {
-                toggleBtn.innerHTML = '<svg class="icon sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/></svg>';
-            } else {
-                toggleBtn.innerHTML = '<svg class="icon moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-            }
+            updateIcon(newTheme);
         });
-        
-        // Initial icon set
-        if (htmlElement.getAttribute('data-theme') === 'light') {
-             toggleBtn.innerHTML = '<svg class="icon moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        } else {
-             toggleBtn.innerHTML = '<svg class="icon sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/></svg>';
-        }
     </script>
 </body>
 </html>

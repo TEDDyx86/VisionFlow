@@ -1,0 +1,98 @@
+#videoElement {
+    display: none;
+}
+
+#landmarkCanvas,
+#effectsCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+
+#landmarkCanvas {
+    z-index: 9998;
+}
+
+#effectsCanvas {
+    z-index: 9997;
+}
+
+/* Cursor Virtual */
+#hand-cursor {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 3px solid var(--brand);
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 10000;
+    transition: transform 0.1s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+    box-shadow: 0 0 15px var(--brand-glow);
+}
+
+#hand-cursor.pinch {
+    background: var(--brand);
+    transform: scale(0.6);
+}
+
+/* Zonas de Scroll */
+.scroll-zone {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 38%;
+    background: linear-gradient(to bottom, rgba(31, 111, 120, 0.05), transparent);
+    pointer-events: none;
+    z-index: 9990;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 20px;
+    color: var(--brand);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.scroll-zone.active {
+    opacity: 1;
+}
+
+.scroll-zone-bottom {
+    top: auto;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(31, 111, 120, 0.05), transparent);
+    align-items: flex-end;
+    padding-top: 0;
+    padding-bottom: 20px;
+}
+
+/* Controls Grid */
+.controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.slider-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.slider-row label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.slider-row input[type="range"] {
+    width: 100%;
+    margin-top: 8px;
+    accent-color: var(--brand);
+}

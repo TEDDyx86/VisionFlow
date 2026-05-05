@@ -1,0 +1,124 @@
+/* Layout Base */
+.wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px clamp(14px, 3vw, 30px);
+}
+
+/* Painéis */
+.panel {
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    background: var(--paper);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 24px;
+    box-shadow: var(--shadow);
+}
+
+/* Botões */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background: var(--brand);
+    color: #ffffff;
+    box-shadow: 0 8px 16px var(--brand-glow);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.btn-secondary {
+    background: var(--paper-solid);
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+.btn-secondary:hover {
+    border-color: var(--brand);
+    background: var(--bg-base);
+}
+
+.btn-warn {
+    background: var(--warn);
+    color: #ffffff;
+}
+
+/* Status Cards */
+.status-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.status-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: 16px;
+    border-radius: 16px;
+}
+
+.status-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    letter-spacing: 0.05em;
+}
+
+.status-value {
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+/* Toasts */
+.toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--brand);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 999px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
+
+/* Modais de Consentimento */
+.consent-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.consent-card {
+    max-width: 500px;
+    background: var(--paper-solid);
+    padding: 32px;
+    border-radius: 24px;
+    text-align: center;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}

@@ -1,0 +1,50 @@
+:root {
+    /* Cores Base */
+    --brand: #1f6f78;
+    --brand-soft: #2ea196;
+    --brand-glow: rgba(31, 111, 120, 0.4);
+    --accent: #f4a261;
+    --accent-soft: #ffb067;
+    --ok: #2a9d8f;
+    --warn: #cf5c36;
+    
+    /* Tema Light (Padrão) */
+    --bg-base: #f8fafc;
+    --bg-gradient-1: rgba(31, 111, 120, 0.15);
+    --bg-gradient-2: rgba(244, 162, 97, 0.25);
+    --paper: rgba(255, 255, 255, 0.75);
+    --paper-solid: #ffffff;
+    --ink: #0f172a;
+    --ink-soft: #475569;
+    --line: rgba(148, 163, 184, 0.3);
+    --shadow: 0 24px 44px rgba(15, 23, 42, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme="dark"] {
+    --bg-base: #0b1120;
+    --bg-gradient-1: rgba(45, 212, 191, 0.15);
+    --bg-gradient-2: rgba(251, 146, 60, 0.12);
+    --paper: rgba(30, 41, 59, 0.6);
+    --paper-solid: #1e293b;
+    --ink: #f8fafc;
+    --ink-soft: #94a3b8;
+    --line: rgba(148, 163, 184, 0.12);
+    --brand: #2dd4bf;
+    --brand-glow: rgba(45, 212, 191, 0.4);
+    --accent: #fb923c;
+    --shadow: 0 24px 44px rgba(0, 0, 0, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+body.high-contrast {
+    --bg-base: #0d1117;
+    --bg-soft: #141a22;
+    --ink: #f0f7ff;
+    --ink-soft: #a7bbcc;
+    --line: #2f4152;
+    --brand: #38d4bf;
+    --accent: #ffb067;
+    --ok: #47d9a2;
+    --warn: #ff7f65;
+}

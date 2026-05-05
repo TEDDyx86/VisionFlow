@@ -4,922 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VisionFlow | Studio Libras</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Sora:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #eef4f3;
-            --bg-soft: #ffffff;
-            --ink: #0f2f35;
-            --ink-soft: #506a6f;
-            --line: #cfe0df;
-            --brand: #0b7f72;
-            --brand-2: #f08a4b;
-            --ok: #1d9f85;
-            --warn: #d4603a;
-            --shadow: 0 22px 44px rgba(16, 46, 52, 0.12);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            min-height: 100%;
-            color: var(--ink);
-            font-family: "Plus Jakarta Sans", sans-serif;
-            background:
-                radial-gradient(circle at 8% 10%, rgba(11, 127, 114, 0.16), transparent 28%),
-                radial-gradient(circle at 95% 4%, rgba(240, 138, 75, 0.18), transparent 30%),
-                linear-gradient(160deg, #ebf2f1 0%, #f5f7f6 45%, #e9efee 100%);
-            overflow-x: hidden;
-        }
-
-        body.high-contrast {
-            --bg: #0d1117;
-            --bg-soft: #141a22;
-            --ink: #f0f7ff;
-            --ink-soft: #a7bbcc;
-            --line: #2f4152;
-            --brand: #38d4bf;
-            --brand-2: #ffb067;
-            --ok: #47d9a2;
-            --warn: #ff7f65;
-            --shadow: 0 22px 44px rgba(0, 0, 0, 0.32);
-            background:
-                radial-gradient(circle at 8% 10%, rgba(56, 212, 191, 0.15), transparent 28%),
-                radial-gradient(circle at 95% 4%, rgba(255, 176, 103, 0.18), transparent 30%),
-                linear-gradient(160deg, #0b1118 0%, #101822 45%, #121f2a 100%);
-        }
-
-        .orb {
-            position: fixed;
-            pointer-events: none;
-            border-radius: 999px;
-            filter: blur(36px);
-            opacity: 0.46;
-            z-index: 0;
-        }
-
-        .orb-a {
-            width: 220px;
-            height: 220px;
-            right: -60px;
-            top: 26px;
-            background: rgba(11, 127, 114, 0.34);
-        }
-
-        .orb-b {
-            width: 260px;
-            height: 260px;
-            left: -86px;
-            bottom: -80px;
-            background: rgba(240, 138, 75, 0.3);
-        }
-
-        #videoElement {
-            display: none;
-        }
-
-        #landmarkCanvas,
-        #effectsCanvas {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-        }
-
-        #landmarkCanvas {
-            z-index: 9998;
-            display: none;
-        }
-
-        #effectsCanvas {
-            z-index: 9997;
-        }
-
-        .toast {
-            position: fixed;
-            left: 50%;
-            bottom: 22px;
-            transform: translateX(-50%);
-            z-index: 10050;
-            border-radius: 999px;
-            padding: 11px 18px;
-            color: #f5fffd;
-            background: linear-gradient(120deg, var(--brand), #2f9b92);
-            font-weight: 700;
-            display: none;
-            box-shadow: 0 12px 26px rgba(11, 127, 114, 0.24);
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 18px;
-            background: rgba(11, 22, 28, 0.44);
-            backdrop-filter: blur(5px);
-            z-index: 10040;
-        }
-
-        .modal.hidden {
-            display: none;
-        }
-
-        .modal-card {
-            width: min(560px, 100%);
-            border-radius: 20px;
-            border: 1px solid var(--line);
-            background: var(--bg-soft);
-            box-shadow: var(--shadow);
-            padding: 22px;
-        }
-
-        .modal-card h2 {
-            margin: 10px 0 8px;
-            font-family: "Sora", sans-serif;
-            font-size: clamp(1.3rem, 2.8vw, 1.8rem);
-        }
-
-        .modal-card p {
-            margin: 0;
-            color: var(--ink-soft);
-            line-height: 1.65;
-        }
-
-        .modal-actions {
-            margin-top: 16px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .app {
-            position: relative;
-            z-index: 2;
-            max-width: 1260px;
-            margin: 0 auto;
-            padding: 22px clamp(14px, 2.8vw, 30px) 70px;
-        }
-
-        .eyebrow {
-            margin: 0;
-            font-size: 0.76rem;
-            letter-spacing: 0.11em;
-            text-transform: uppercase;
-            color: var(--brand);
-            font-weight: 800;
-        }
-
-        .hero {
-            display: grid;
-            grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-            gap: 14px;
-            align-items: stretch;
-        }
-
-        .hero-main,
-        .hero-live {
-            border: 1px solid var(--line);
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.78);
-            box-shadow: var(--shadow);
-            padding: 16px;
-        }
-
-        body.high-contrast .hero-main,
-        body.high-contrast .hero-live {
-            background: rgba(20, 26, 34, 0.86);
-        }
-
-        h1 {
-            margin: 8px 0 8px;
-            font-family: "Sora", sans-serif;
-            font-size: clamp(1.8rem, 4.4vw, 2.8rem);
-            line-height: 1.05;
-            letter-spacing: -0.02em;
-        }
-
-        .hero-main p {
-            margin: 0;
-            color: var(--ink-soft);
-            line-height: 1.7;
-            max-width: 760px;
-        }
-
-        .hero-links {
-            margin-top: 12px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .hero-link {
-            text-decoration: none;
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            padding: 9px 12px;
-            color: var(--ink);
-            background: var(--bg-soft);
-            font-weight: 700;
-            font-size: 0.88rem;
-        }
-
-        .hero-live-title {
-            margin: 0;
-            font-size: 0.84rem;
-            color: var(--ink-soft);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            font-weight: 700;
-        }
-
-        .live-letter {
-            margin-top: 8px;
-            font-family: "Sora", sans-serif;
-            font-size: clamp(2.8rem, 5vw, 4.2rem);
-            line-height: 1;
-            color: var(--brand);
-            min-height: 68px;
-        }
-
-        .meter {
-            margin-top: 10px;
-            height: 12px;
-            border-radius: 999px;
-            background: rgba(9, 48, 44, 0.12);
-            border: 1px solid var(--line);
-            overflow: hidden;
-        }
-
-        .meter-fill {
-            width: 0;
-            height: 100%;
-            border-radius: inherit;
-            background: linear-gradient(120deg, var(--brand), #2ea196);
-            transition: width 160ms ease;
-        }
-
-        .live-meta {
-            margin-top: 8px;
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            color: var(--ink-soft);
-            font-weight: 700;
-            font-size: 0.84rem;
-        }
-
-        .status-strip {
-            margin-top: 12px;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
-        }
-
-        .status-card {
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.74);
-            padding: 9px 11px;
-        }
-
-        body.high-contrast .status-card {
-            background: rgba(20, 26, 34, 0.8);
-        }
-
-        .status-card span {
-            display: block;
-        }
-
-        .status-label {
-            color: var(--ink-soft);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            font-size: 0.72rem;
-        }
-
-        .status-value {
-            margin-top: 5px;
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
-
-        .detectado {
-            color: var(--ok);
-        }
-
-        .perdido {
-            color: var(--warn);
-        }
-
-        .layout {
-            margin-top: 12px;
-            display: grid;
-            grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
-            gap: 10px;
-            align-items: start;
-        }
-
-        .column {
-            display: grid;
-            gap: 10px;
-        }
-
-        .panel {
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: var(--shadow);
-            padding: 14px;
-        }
-
-        body.high-contrast .panel {
-            background: rgba(20, 26, 34, 0.84);
-        }
-
-        .panel h2 {
-            margin: 0 0 8px;
-            font-family: "Sora", sans-serif;
-            font-size: 1rem;
-            letter-spacing: 0.01em;
-        }
-
-        .muted {
-            margin: 0;
-            color: var(--ink-soft);
-            line-height: 1.6;
-            font-size: 0.92rem;
-        }
-
-        .btn-grid {
-            margin-top: 10px;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
-        }
-
-        .btn {
-            border: 1px solid transparent;
-            border-radius: 11px;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 0.86rem;
-            padding: 10px 11px;
-            cursor: pointer;
-            transition: transform 120ms ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-        }
-
-        .btn.primary {
-            color: #f3fffd;
-            background: linear-gradient(120deg, var(--brand), #2f9b92);
-            box-shadow: 0 10px 20px rgba(11, 127, 114, 0.22);
-        }
-
-        .btn.secondary {
-            color: var(--ink);
-            border-color: var(--line);
-            background: var(--bg-soft);
-        }
-
-        .btn.warn {
-            color: #fff6f1;
-            background: linear-gradient(120deg, #d4603a, #e17b4a);
-        }
-
-        .slider-wrap {
-            margin-top: 8px;
-            display: grid;
-            gap: 9px;
-        }
-
-        .slider-row {
-            display: grid;
-            gap: 5px;
-        }
-
-        .slider-row label {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            font-size: 0.86rem;
-            font-weight: 700;
-            color: var(--ink);
-        }
-
-        .slider-row input[type="range"] {
-            width: 100%;
-            accent-color: var(--brand);
-        }
-
-        .inline-row {
-            margin-top: 8px;
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: 8px;
-        }
-
-        .input {
-            width: 100%;
-            border: 1px solid var(--line);
-            background: var(--bg-soft);
-            color: var(--ink);
-            border-radius: 10px;
-            padding: 10px 10px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .input:focus {
-            border-color: var(--brand);
-            box-shadow: 0 0 0 3px rgba(11, 127, 114, 0.12);
-        }
-
-        .template-status {
-            margin: 8px 0 0;
-            color: var(--ink-soft);
-            font-size: 0.82rem;
-            line-height: 1.5;
-        }
-
-        .template-list {
-            margin: 8px 0 0;
-            padding: 0;
-            list-style: none;
-            display: grid;
-            gap: 7px;
-            max-height: 190px;
-            overflow: auto;
-        }
-
-        .template-item {
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.84);
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 8px;
-            align-items: center;
-            padding: 8px;
-        }
-
-        body.high-contrast .template-item {
-            background: rgba(20, 26, 34, 0.9);
-        }
-
-        .template-item small {
-            display: block;
-            color: var(--ink-soft);
-            font-size: 0.74rem;
-            margin-top: 3px;
-        }
-
-        .mini {
-            border: 1px solid var(--line);
-            background: var(--bg-soft);
-            color: var(--ink);
-            border-radius: 8px;
-            padding: 6px 8px;
-            font-size: 0.74rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .output-text {
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: var(--bg-soft);
-            min-height: 90px;
-            padding: 12px;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-size: 1.01rem;
-            color: var(--ink);
-        }
-
-        .output-text.placeholder {
-            color: #7b9197;
-            font-style: italic;
-        }
-
-        .composer-actions {
-            margin-top: 9px;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
-        }
-
-        .suggestion-wrap {
-            margin-top: 10px;
-            display: grid;
-            gap: 7px;
-        }
-
-        .suggestion-wrap span {
-            font-size: 0.8rem;
-            color: var(--ink-soft);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            font-weight: 700;
-        }
-
-        .suggestions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 7px;
-        }
-
-        .chip {
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            background: var(--bg-soft);
-            color: var(--ink);
-            padding: 6px 9px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .empty-chip {
-            color: var(--ink-soft);
-            font-size: 0.82rem;
-            padding: 4px 0;
-        }
-
-        .log-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            display: grid;
-            gap: 7px;
-            max-height: 360px;
-            overflow: auto;
-        }
-
-        .log-item {
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.84);
-            display: grid;
-            gap: 3px;
-        }
-
-        body.high-contrast .log-item {
-            background: rgba(20, 26, 34, 0.86);
-        }
-
-        .log-time {
-            font-size: 0.72rem;
-            color: var(--ink-soft);
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-
-        .log-msg {
-            font-size: 0.86rem;
-        }
-
-        .shortcut-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            display: grid;
-            gap: 6px;
-        }
-
-        .shortcut-item {
-            border: 1px solid var(--line);
-            border-radius: 9px;
-            background: var(--bg-soft);
-            padding: 7px;
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            font-size: 0.83rem;
-        }
-
-        .shortcut-item kbd {
-            font-family: inherit;
-            border: 1px solid var(--line);
-            border-radius: 6px;
-            padding: 2px 6px;
-            background: rgba(12, 48, 53, 0.08);
-            font-weight: 800;
-            font-size: 0.72rem;
-        }
-
-        @media (max-width: 1040px) {
-            .hero {
-                grid-template-columns: 1fr;
-            }
-
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            .status-strip {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 760px) {
-            .btn-grid,
-            .composer-actions {
-                grid-template-columns: 1fr;
-            }
-
-            .inline-row {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-actions {
-                flex-direction: column;
-            }
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* FPS Badge Flutuante */
-        .fps-badge {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: linear-gradient(135deg, var(--brand), #2f9b92);
-            color: #fff;
-            font-size: 0.75rem;
-            font-weight: 800;
-            padding: 6px 12px;
-            border-radius: 999px;
-            z-index: 10020;
-            box-shadow: 0 4px 16px rgba(11, 127, 114, 0.3);
-            letter-spacing: 0.04em;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .fps-badge .fps-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #7fffec;
-            animation: pulse 1.2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* Confetti */
-        .confetti-piece {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            border-radius: 2px;
-            pointer-events: none;
-            z-index: 10100;
-            animation: confetti-fall 1.2s ease-out forwards;
-        }
-        @keyframes confetti-fall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(200px) rotate(720deg); opacity: 0; }
-        }
-
-        /* Word History */
-        .word-history-panel {
-            position: fixed;
-            left: 20px;
-            bottom: 20px;
-            max-width: 260px;
-            background: var(--bg-soft);
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            padding: 12px 14px;
-            z-index: 10005;
-            box-shadow: 0 8px 24px rgba(11, 127, 114, 0.12);
-        }
-        .word-history-title {
-            font-size: 0.72rem;
-            font-weight: 800;
-            color: var(--brand);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .word-history-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-        .word-chip {
-            background: var(--bg);
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 3px 8px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--ink);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .word-chip:hover {
-            background: var(--brand);
-            color: #fff;
-            border-color: var(--brand);
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/tokens.css">
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/pages/libras.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 </head>
 <body>
-    <div class="orb orb-a"></div>
-    <div class="orb orb-b"></div>
-
     <canvas id="landmarkCanvas"></canvas>
-    <canvas id="effectsCanvas"></canvas>
     <video id="videoElement" autoplay muted playsinline></video>
+    <div id="notification-toast" class="toast" style="display: none;"></div>
 
-    <div id="notification-toast" class="toast"></div>
-
-    <!-- FPS Badge Flutuante -->
-    <div class="fps-badge" id="fps-badge">
-        <div class="fps-dot"></div>
-        <span id="fps-badge-text">-- FPS</span>
-    </div>
-
-    <!-- Word History Panel -->
-    <div class="word-history-panel" id="word-history-panel">
-        <div class="word-history-title">
-            Historico de Palavras
-            <button id="clear-word-history" style="background:none;border:none;color:var(--warn);cursor:pointer;font-size:0.75rem;">Limpar</button>
-        </div>
-        <div class="word-history-list" id="word-history-list"></div>
-    </div>
-
-    <div id="consent-modal" class="modal hidden">
-        <div class="modal-card">
-            <p class="eyebrow">Permissao de camera</p>
-            <h2>Ativar camera para interpretar Libras</h2>
-            <p>Todo o processamento acontece no navegador. Sem camera, o studio permanece disponivel para revisao de frases e templates, mas sem reconhecimento ao vivo.</p>
-            <div class="modal-actions">
-                <button id="accept-consent" class="btn primary">Aceitar e iniciar camera</button>
-                <button id="deny-consent" class="btn secondary">Continuar sem camera</button>
+    <div id="consent-modal" class="consent-overlay hidden">
+        <div class="consent-card">
+            <h2>Interpretação Libras</h2>
+            <p style="margin: 16px 0; color: var(--ink-soft);">Para interpretar seus sinais em tempo real, precisamos acessar sua câmera. O processamento é 100% privado.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="accept-consent" class="btn btn-primary">Ativar Câmera</button>
+                <button id="deny-consent" class="btn btn-secondary">Não agora</button>
             </div>
         </div>
     </div>
 
-    <div class="app">
-        <header class="hero">
-            <section class="hero-main">
-                <p class="eyebrow">VisionFlow Libras</p>
-                <h1>Studio completo de interpretacao em Libras</h1>
-                <p>Experiencia dedicada para leitura de sinais, construcao de frase, sugestoes contextuais e treinamento de templates personalizados em uma pagina exclusiva.</p>
-                <div class="hero-links">
-                    <a class="hero-link" href="../../../index.html">Pagina inicial</a>
-                    <a class="hero-link" href="../hand-biometrics/index.html">Controle por gestos</a>
+    <div class="wrap">
+        <header style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; margin-bottom: 32px; align-items: stretch;">
+            <section class="panel">
+                <p class="status-label">VisionFlow Studio</p>
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; margin: 8px 0;">Studio Completo Libras</h1>
+                <p class="muted">Interpretação inteligente com sugestões contextuais e treinamento de sinais personalizados.</p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                    <a href="/index.html" class="btn btn-secondary">Início</a>
+                    <a href="/biometria" class="btn btn-secondary">Biometria</a>
                 </div>
             </section>
+            
             <aside class="hero-live">
-                <p class="hero-live-title">Reconhecimento ao vivo</p>
+                <p class="hero-live-title">Sinal Detectado</p>
                 <div id="current-letter" class="live-letter">-</div>
                 <div class="meter">
-                    <div id="confidence-fill" class="meter-fill"></div>
+                    <div id="confidence-fill" class="meter-fill" style="width: 0%"></div>
                 </div>
-                <div class="live-meta">
-                    <span id="confidence-text">Confianca 0%</span>
-                    <span id="quality-text">Qualidade aguardando camera</span>
-                </div>
+                <div id="confidence-text" class="status-label" style="text-align: center;">Confiança 0%</div>
             </aside>
         </header>
 
-        <section class="status-strip">
+        <div class="status-strip">
             <article class="status-card">
-                <span class="status-label">Camera</span>
-                <span id="camera-status" class="status-value perdido">Desligada</span>
+                <span class="status-label">Câmera</span>
+                <div id="camera-status" class="status-value perdido">Desligada</div>
             </article>
             <article class="status-card">
-                <span class="status-label">Mao</span>
-                <span id="hand-status" class="status-value perdido">Nao detectada</span>
+                <span class="status-label">Mão</span>
+                <div id="hand-status" class="status-value perdido">Não detectada</div>
             </article>
             <article class="status-card">
-                <span class="status-label">Motor de Libras</span>
-                <span id="engine-status" class="status-value perdido">Aguardando inicializacao</span>
+                <span class="status-label">Motor</span>
+                <div id="engine-status" class="status-value">Aguardando...</div>
             </article>
-        </section>
+        </div>
 
-        <main class="layout">
-            <section class="column">
+        <main style="display: grid; grid-template-columns: 380px 1fr; gap: 24px;">
+            <section style="display: grid; gap: 24px;">
                 <article class="panel">
-                    <h2>Controle do studio</h2>
-                    <p class="muted">Use os botoes abaixo para iniciar captura, alternar visualizacao de landmarks, contraste alto e reset completo da sessao.</p>
-                    <div class="btn-grid">
-                        <button id="toggle-camera" class="btn primary">Iniciar camera</button>
-                        <button id="toggle-landmarks" class="btn secondary">Mostrar landmarks</button>
-                        <button id="toggle-contrast" class="btn secondary">Contraste alto: off</button>
-                        <button id="reset-session" class="btn warn">Resetar sessao</button>
+                    <h2>Controle</h2>
+                    <div style="display: grid; gap: 12px; margin-top: 16px;">
+                        <button id="toggle-camera" class="btn btn-primary">Iniciar Câmera</button>
+                        <button id="reset-session" class="btn btn-warn">Resetar Studio</button>
                     </div>
                 </article>
 
                 <article class="panel">
-                    <h2>Configuracao de reconhecimento</h2>
-                    <div class="slider-wrap">
-                        <div class="slider-row">
-                            <label for="slider-stability">Estabilidade de commit <strong id="value-stability">620ms</strong></label>
-                            <input id="slider-stability" type="range" min="320" max="1400" step="20" value="620">
-                        </div>
-                        <div class="slider-row">
-                            <label for="slider-confidence">Confianca minima <strong id="value-confidence">78%</strong></label>
-                            <input id="slider-confidence" type="range" min="50" max="96" step="1" value="78">
-                        </div>
-                        <div class="slider-row">
-                            <label for="slider-cooldown">Cooldown entre commits <strong id="value-cooldown">420ms</strong></label>
-                            <input id="slider-cooldown" type="range" min="220" max="1200" step="20" value="420">
-                        </div>
-                        <div class="slider-row">
-                            <label for="slider-smoothing">Suavizacao landmarks <strong id="value-smoothing">0.62</strong></label>
-                            <input id="slider-smoothing" type="range" min="0.35" max="0.9" step="0.01" value="0.62">
-                        </div>
+                    <h2>Grid do Alfabeto</h2>
+                    <div id="visual-grid" class="visual-grid">
+                        <!-- Generative JS will fill this -->
                     </div>
-                </article>
-
-                <article class="panel">
-                    <h2>Treinar sinal personalizado</h2>
-                    <p class="muted">Grave seu proprio sinal para letras, comandos como ESPACO e APAGAR, ou palavras curtas.</p>
-                    <div class="inline-row">
-                        <input id="custom-label-input" class="input" type="text" maxlength="24" placeholder="Ex.: A, B, ESPACO, OLA">
-                        <button id="record-template" class="btn primary">Iniciar captura</button>
-                    </div>
-                    <div class="btn-grid" style="margin-top: 8px;">
-                        <button id="save-template" class="btn secondary">Salvar template</button>
-                        <button id="clear-templates" class="btn warn">Limpar templates</button>
-                    </div>
-                    <p id="template-status" class="template-status">Nenhuma captura em andamento.</p>
-                    <ul id="template-list" class="template-list"></ul>
-                </article>
-
-                <article class="panel">
-                    <h2>Atalhos de acessibilidade</h2>
-                    <ul class="shortcut-list">
-                        <li class="shortcut-item"><span>Inserir espaco</span><kbd>Alt + S</kbd></li>
-                        <li class="shortcut-item"><span>Apagar ultimo caractere</span><kbd>Alt + B</kbd></li>
-                        <li class="shortcut-item"><span>Alternar landmarks</span><kbd>Alt + L</kbd></li>
-                        <li class="shortcut-item"><span>Resetar frase</span><kbd>Alt + R</kbd></li>
-                        <li class="shortcut-item"><span>Contraste alto</span><kbd>Alt + C</kbd></li>
-                        <li class="shortcut-item"><span>Limpar Grid</span><kbd>Alt + G</kbd></li>
-                    </ul>
                 </article>
             </section>
 
-            <section class="column">
+            <section style="display: grid; gap: 24px;">
                 <article class="panel">
-                    <h2>Frase interpretada</h2>
+                    <h2>Transcrição da Frase</h2>
                     <div id="output-text" class="output-text placeholder">Aguardando reconhecimento de sinais...</div>
                     <div class="composer-actions">
-                        <button id="action-space" class="btn secondary">Espaco</button>
-                        <button id="action-backspace" class="btn secondary">Apagar</button>
-                        <button id="action-clear" class="btn warn">Limpar</button>
-                        <button id="action-copy" class="btn secondary">Copiar</button>
-                        <button id="action-export" class="btn secondary">Exportar TXT</button>
+                        <button id="action-space" class="btn btn-secondary">Espaço</button>
+                        <button id="action-backspace" class="btn btn-secondary">Apagar</button>
+                        <button id="action-clear" class="btn btn-warn">Limpar Tudo</button>
                     </div>
-                    <div class="suggestion-wrap">
-                        <span>Sugestoes contextuais</span>
+                    <div style="margin-top: 20px;">
+                        <span class="status-label">Sugestões Contextuais</span>
                         <div id="suggestions" class="suggestions"></div>
                     </div>
                 </article>
 
                 <article class="panel">
-                    <h2>Historico de reconhecimento</h2>
-                    <ul id="recognition-log" class="log-list"></ul>
-                </article>
-
-                <article class="panel">
-                    <h2>Grid do Alfabeto</h2>
-                    <p class="muted" style="font-size:0.82rem;margin-bottom:8px;">A letra detectada com alta confiança acende aqui em tempo real.</p>
-                    <div id="visual-grid" class="visual-grid"></div>
-                    <button id="clear-grid-btn" class="btn secondary" style="margin-top:10px;width:100%;">Limpar Grid (Alt+G)</button>
+                    <h2>Histórico</h2>
+                    <ul id="recognition-log" class="log-list">
+                        <li class="log-item">Studio inicializado e pronto.</li>
+                    </ul>
                 </article>
             </section>
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="/src/features/libras/main.js"></script>
 </body>
 </html>
